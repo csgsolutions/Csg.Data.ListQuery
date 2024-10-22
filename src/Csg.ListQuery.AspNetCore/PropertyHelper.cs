@@ -2,42 +2,43 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-namespace Csg.ListQuery.AspNetCore
+namespace Csg.ListQuery.AspNetCore;
+
+/// <summary>
+/// Helper methods for property reflection
+/// </summary>
+public static class PropertyHelper
 {
     /// <summary>
-    /// Helper methods for property reflection
+    /// Gets a list of the properties for a give type and optionally matching the given predicate.
     /// </summary>
-    public static class PropertyHelper
+    /// <param name="type"></param>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
+    public static Dictionary<string, ListItemPropertyInfo> GetProperties(Type type, Func<ListItemPropertyInfo, bool> predicate = null, int? maxRecursionDepth = null)
     {
-        /// <summary>
-        /// Gets a list of the properties for a give type and optionally matching the given predicate.
-        /// </summary>
-        /// <param name="type"></param>
-        /// <param name="predicate"></param>
-        /// <returns></returns>
-        public static Dictionary<string, ListItemPropertyInfo> GetProperties(Type type, Func<ListItemPropertyInfo, bool> predicate = null, int? maxRecursionDepth = null)
-        {
-            var listConfigs = Csg.ListQuery.Internal.ReflectionHelper.GetFieldsFromType(type, fromCache: true, maxRecursionDepth: maxRecursionDepth);
+        var listConfigs = Csg.ListQuery.Internal.ReflectionHelper.GetFieldsFromType(type, fromCache: true, maxRecursionDepth: maxRecursionDepth);
            
-            return listConfigs
-                .Select(prop =>
-                {
-                    var propInfo = new ListItemPropertyInfo();
-                    var jsonPropertyAttribute = prop.PropertyInfo.GetCustomAttributes(typeof(Newtonsoft.Json.JsonPropertyAttribute), false).FirstOrDefault();
+        return listConfigs
+            .Select(prop =>
+            {
+                var propInfo = new ListItemPropertyInfo();
+                var jsonPropertyAttribute = prop.PropertyInfo.GetCustomAttributes(typeof(System.Text.Json.JsonProperty), false).FirstOrDefault();
 
-                    propInfo.Property = prop.PropertyInfo;
-                    propInfo.PropertyName = prop.Name;                    
-                    propInfo.JsonName = ((Newtonsoft.Json.JsonPropertyAttribute)jsonPropertyAttribute)?.PropertyName ?? prop.Name;
-                    propInfo.IsFilterable = prop.IsFilterable == true;
-                    propInfo.IsSortable = prop.IsSortable == true;
-                    propInfo.Description = prop.Description;
+                propInfo.Property = prop.PropertyInfo;
+                propInfo.PropertyName = prop.Name;
+                if (jsonPropertyAttribute != null)
+                    propInfo.JsonName = ((System.Text.Json.JsonProperty)jsonPropertyAttribute).Name;
+                if (jsonPropertyAttribute == null)
+                    propInfo.JsonName = prop.Name;
+                propInfo.IsFilterable = prop.IsFilterable == true;
+                propInfo.IsSortable = prop.IsSortable == true;
+                propInfo.Description = prop.Description;
 
-                    return propInfo;
-                })
-                .Where(x => predicate == null || predicate(x))
-                .ToDictionary(k => k.PropertyName, StringComparer.OrdinalIgnoreCase);
-        }
+                return propInfo;
+            })
+            .Where(x => predicate == null || predicate(x))
+            .ToDictionary(k => k.PropertyName, StringComparer.OrdinalIgnoreCase);
     }
 }

@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Csg.ListQuery;
 
-namespace AspNetCoreWebAPI.Internal
+namespace AspNetCoreWebAPI.Internal;
+
+public interface IRepository
 {
-    public interface IRepository
-    {
-        Task<ListQueryResult<WeatherForecast>> GetWidgetsAsync(ListQueryDefinition queryDef);
-    }
+    Task<ListQueryResult<WeatherForecast>> GetWidgetsAsync(ListQueryDefinition queryDef);
 }

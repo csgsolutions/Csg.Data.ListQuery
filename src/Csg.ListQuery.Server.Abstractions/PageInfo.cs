@@ -1,14 +1,13 @@
-﻿namespace Csg.ListQuery.Server
+﻿namespace Csg.ListQuery.Server;
+
+public struct PageInfo
 {
-    public struct PageInfo
+    private int _offset;
+
+    public PageInfo(int offset)
     {
-        private int _offset;
-
-        public PageInfo(int offset)
-        {
-            _offset = offset;
-        }
-
-        public int Offset => _offset;
+        _offset = offset;
     }
+
+    public int Offset => _offset;
 }

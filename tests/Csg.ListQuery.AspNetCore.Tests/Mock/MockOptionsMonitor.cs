@@ -1,36 +1,33 @@
 ﻿using Microsoft.Extensions.Options;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Csg.ListQuery.AspNetCore.Tests.Mock
+namespace Csg.ListQuery.AspNetCore.Tests.Mock;
+
+public class MockOptionsMonitor<T> : IOptionsMonitor<T>
+    where T : class, new()
 {
-    public class MockOptionsMonitor<T> : IOptionsMonitor<T>
-        where T : class, new()
+    public MockOptionsMonitor(T currentValue)
     {
-        public MockOptionsMonitor(T currentValue)
-        {
-            CurrentValue = currentValue;
-        }
-
-        public T Get(string name)
-        {
-            return CurrentValue;
-        }
-
-        public IDisposable OnChange(Action<T, string> listener)
-        {
-            return new MockDisposable();
-        }
-
-        public T CurrentValue { get; }
+        CurrentValue = currentValue;
     }
 
-    public class MockDisposable : IDisposable
+    public T Get(string name)
     {
-        public void Dispose()
-        {
-            throw new NotImplementedException();
-        }
+        return CurrentValue;
+    }
+
+    public IDisposable OnChange(Action<T, string> listener)
+    {
+        return new MockDisposable();
+    }
+
+    public T CurrentValue { get; }
+}
+
+public class MockDisposable : IDisposable
+{
+    public void Dispose()
+    {
+        throw new NotImplementedException();
     }
 }

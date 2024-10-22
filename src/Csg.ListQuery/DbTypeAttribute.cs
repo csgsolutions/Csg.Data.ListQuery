@@ -1,47 +1,46 @@
 ﻿using System;
 
-namespace Csg.ListQuery
+namespace Csg.ListQuery;
+
+/// <summary>
+/// Indicates the underlying data type for a given property. Used for applying filters in a data source.
+/// </summary>
+[System.AttributeUsage(AttributeTargets.Property)]
+public class DbTypeAttribute : System.Attribute
 {
+    private readonly System.Data.DbType _type;
+    private readonly int? _size;
+
     /// <summary>
-    /// Indicates the underlying data type for a given property. Used for applying filters in a data source.
+    /// Initializes an instance with the given options.
     /// </summary>
-    [System.AttributeUsage(AttributeTargets.Property)]
-    public class DbTypeAttribute : System.Attribute
+    /// <param name="type"></param>
+    /// <param name="size"></param>
+    public DbTypeAttribute(System.Data.DbType type, int size = 0)
     {
-        private readonly System.Data.DbType _type;
-        private readonly int? _size;
+        _type = type;
+        _size = size > 0 ? (int?)size : null;
+    }
 
-        /// <summary>
-        /// Initializes an instance with the given options.
-        /// </summary>
-        /// <param name="type"></param>
-        /// <param name="size"></param>
-        public DbTypeAttribute(System.Data.DbType type, int size = 0)
+    /// <summary>
+    /// Gets the data source type.
+    /// </summary>
+    public System.Data.DbType DbType
+    {
+        get
         {
-            _type = type;
-            _size = size > 0 ? (int?)size : null;
+            return _type;
         }
+    }
 
-        /// <summary>
-        /// Gets the data source type.
-        /// </summary>
-        public System.Data.DbType DbType
+    /// <summary>
+    /// Gets the data type size.
+    /// </summary>
+    public int? Size
+    {
+        get
         {
-            get
-            {
-                return _type;
-            }
-        }
-
-        /// <summary>
-        /// Gets the data type size.
-        /// </summary>
-        public int? Size
-        {
-            get
-            {
-                return _size;
-            }
+            return _size;
         }
     }
 }

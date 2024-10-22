@@ -1,20 +1,15 @@
 ﻿using Csg.ListQuery;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace AspNetCoreWebAPI
+namespace AspNetCoreWebAPI;
+
+public class Person
 {
-    public class Person
-    {
-        [Filterable]
-        public int PersonID { get; set; }
+    [Filterable]
+    public int PersonID { get; set; }
 
-        [Sortable]
-        public string FirstName { get; set; }
+    [Sortable]
+    public string FirstName { get; set; }
 
-        [Sortable]
-        public string LastName { get; set; }
-    }
+    [Sortable]
+    public string LastName { get; set; }
 }
