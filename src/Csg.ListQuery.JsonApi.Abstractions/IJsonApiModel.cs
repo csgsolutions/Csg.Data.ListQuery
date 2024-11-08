@@ -1,8 +1,7 @@
-﻿namespace Csg.ListQuery.JsonApi.Abstractions
+﻿namespace Csg.ListQuery.JsonApi.Abstractions;
+
+public interface IJsonApiModel
 {
-    public interface IJsonApiModel
-    {
-        string ID { get; }
-        string Type { get; }
-    }
+    string ID { get; }
+    string Type { get; }
 }

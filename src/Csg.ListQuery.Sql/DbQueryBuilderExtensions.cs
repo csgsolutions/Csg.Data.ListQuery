@@ -1,92 +1,84 @@
 ﻿using Csg.ListQuery;
-using Csg.ListQuery.Internal;
 using Csg.Data.Sql;
 using System;
-using System.Collections.Generic;
-using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Csg.Data;
-using Csg.ListQuery.Sql.Internal;
 using Csg.ListQuery.Sql;
 
-namespace Csg.Data
+namespace Csg.Data;
+
+/// <summary>
+/// Extension methods for the <see cref="IDbQueryBuilder"/>.
+/// </summary>
+public static class DbQueryBuilderExtensions
 {
-    /// <summary>
-    /// Extension methods for the <see cref="IDbQueryBuilder"/>.
-    /// </summary>
-    public static class DbQueryBuilderExtensions
+    public static IListQueryBuilder ListQuery(this IDbQueryBuilder queryBuilder, ListQueryDefinition queryDef)
     {
-        public static IListQueryBuilder ListQuery(this IDbQueryBuilder queryBuilder, ListQueryDefinition queryDef)
-        {
-            return Csg.ListQuery.Sql.ListQueryBuilder.Create(queryBuilder, queryDef);
-        }
+        return Csg.ListQuery.Sql.ListQueryBuilder.Create(queryBuilder, queryDef);
+    }
         
-        /// <summary>
-        /// Sets the columns that will be selected on the given query builder and replaces any existing selections.
-        /// </summary>
-        /// <param name="queryBuilder"></param>
-        /// <param name="columns"></param>
-        /// <remarks>This method replaces any existing selected columns on the query builder.</remarks>
-        /// <returns></returns>
-        public static IDbQueryBuilder SelectOnly(this IDbQueryBuilder queryBuilder, params ISqlColumn[] columns)
+    /// <summary>
+    /// Sets the columns that will be selected on the given query builder and replaces any existing selections.
+    /// </summary>
+    /// <param name="queryBuilder"></param>
+    /// <param name="columns"></param>
+    /// <remarks>This method replaces any existing selected columns on the query builder.</remarks>
+    /// <returns></returns>
+    public static IDbQueryBuilder SelectOnly(this IDbQueryBuilder queryBuilder, params ISqlColumn[] columns)
+    {
+        var query = queryBuilder.Fork();
+
+        query.SelectColumns.Clear();
+
+        foreach (var col in columns)
         {
-            var query = queryBuilder.Fork();
-
-            query.SelectColumns.Clear();
-
-            foreach (var col in columns)
-            {
-                query.SelectColumns.Add(col);
-            }
-
-            return query;
+            query.SelectColumns.Add(col);
         }
 
-        /// <summary>
-        /// Sets the columns that will be selected on the given query builder and replaces any existing selections.
-        /// </summary>
-        /// <param name="queryBuilder"></param>
-        /// <param name="columns"></param>
-        /// <remarks>This method replaces any existing selected columns on the query builder.</remarks>
-        /// <returns></returns>
-        public static IDbQueryBuilder SelectOnly(this IDbQueryBuilder queryBuilder, params string[] columns)
-        {
-            return SelectOnly(queryBuilder, queryBuilder.Root.Columns(columns).ToArray());
-        }
+        return query;
+    }
 
-        /// <summary>
-        /// Applies filters to the given where clause and joins them together in OR logic.
-        /// </summary>
-        /// <param name="where"></param>
-        /// <param name="whereClause"></param>
-        /// <returns></returns>
-        public static IDbQueryWhereClause Any(this Csg.Data.IDbQueryWhereClause where, Action<IDbQueryWhereClause> whereClause)
-        {
-            var orWhere = new Csg.Data.DbQueryWhereClause(where.Root, SqlLogic.Or);
+    /// <summary>
+    /// Sets the columns that will be selected on the given query builder and replaces any existing selections.
+    /// </summary>
+    /// <param name="queryBuilder"></param>
+    /// <param name="columns"></param>
+    /// <remarks>This method replaces any existing selected columns on the query builder.</remarks>
+    /// <returns></returns>
+    public static IDbQueryBuilder SelectOnly(this IDbQueryBuilder queryBuilder, params string[] columns)
+    {
+        return SelectOnly(queryBuilder, queryBuilder.Root.Columns(columns).ToArray());
+    }
 
-            whereClause(orWhere);
-            where.AddFilter(orWhere.Filters);
+    /// <summary>
+    /// Applies filters to the given where clause and joins them together in OR logic.
+    /// </summary>
+    /// <param name="where"></param>
+    /// <param name="whereClause"></param>
+    /// <returns></returns>
+    public static IDbQueryWhereClause Any(this Csg.Data.IDbQueryWhereClause where, Action<IDbQueryWhereClause> whereClause)
+    {
+        var orWhere = new Csg.Data.DbQueryWhereClause(where.Root, SqlLogic.Or);
 
-            return where;
-        }
+        whereClause(orWhere);
+        where.AddFilter(orWhere.Filters);
 
-        /// <summary>
-        /// Adds the given filter to a query builder where clause.
-        /// </summary>
-        /// <param name="where"></param>
-        /// <param name="filter"></param>
-        /// <param name="valueType"></param>
-        /// <param name="valueTypeSize"></param>
-        /// <param name="stringMatchType"></param>
-        /// <param name="performDataTypeConversion"></param>
-        /// <param name="valueConverter"></param>
-        /// <returns></returns>
-        public static IDbQueryWhereClause AddFilter(this Csg.Data.IDbQueryWhereClause where, ListFilter filter, System.Data.DbType valueType, int? valueTypeSize = null, SqlWildcardDecoration stringMatchType = SqlWildcardDecoration.BeginsWith, bool performDataTypeConversion = true, Func<object, object> valueConverter = null)
-        {
-            Csg.ListQuery.Sql.Internal.Extensions.AddFilter(where, filter.Name, filter.Operator ?? ListFilterOperator.Equal, filter.Value, valueType: valueType, valueTypeSize: valueTypeSize, stringMatchType: stringMatchType, performDataTypeConversion: performDataTypeConversion, valueConverter: valueConverter);
-            return where;
-        }
+        return where;
+    }
+
+    /// <summary>
+    /// Adds the given filter to a query builder where clause.
+    /// </summary>
+    /// <param name="where"></param>
+    /// <param name="filter"></param>
+    /// <param name="valueType"></param>
+    /// <param name="valueTypeSize"></param>
+    /// <param name="stringMatchType"></param>
+    /// <param name="performDataTypeConversion"></param>
+    /// <param name="valueConverter"></param>
+    /// <returns></returns>
+    public static IDbQueryWhereClause AddFilter(this Csg.Data.IDbQueryWhereClause where, ListFilter filter, System.Data.DbType valueType, int? valueTypeSize = null, SqlWildcardDecoration stringMatchType = SqlWildcardDecoration.BeginsWith, bool performDataTypeConversion = true, Func<object, object> valueConverter = null)
+    {
+        Csg.ListQuery.Sql.Internal.Extensions.AddFilter(where, filter.Name, filter.Operator ?? ListFilterOperator.Equal, filter.Value, valueType: valueType, valueTypeSize: valueTypeSize, stringMatchType: stringMatchType, performDataTypeConversion: performDataTypeConversion, valueConverter: valueConverter);
+        return where;
     }
 }
